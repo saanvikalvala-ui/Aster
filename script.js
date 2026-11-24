@@ -40,21 +40,6 @@ const state = {
   ],
 };
 
-const icons = {
-  Arrow: "→",
-  Star: "✦",
-  Check: "✓",
-  Target: "◎",
-  Flame: "♨",
-  Calendar: "▦",
-  Book: "▤",
-  Award: "◇",
-  Work: "▱",
-  Heart: "♡",
-  Graduation: "⌂",
-  Spark: "✧",
-  Chart: "▥",
-};
 
 const opportunities = {
   Scholarships: [
@@ -75,20 +60,19 @@ const opportunities = {
 };
 
 function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;",
-  })[character]);
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function show(view) {
   state.view = view;
   document.querySelector("#landing-view").hidden = view !== "landing";
-  document.querySelector("#onboarding-view").hidden = view !== "onboarding";
   document.querySelector("#signin-view").hidden = view !== "signin";
+  document.querySelector("#onboarding-view").hidden = view !== "onboarding";
   document.querySelector("#workspace-view").hidden = view !== "workspace";
   if (view === "onboarding") renderOnboarding();
   if (view === "workspace") renderWorkspace();
