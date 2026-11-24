@@ -3,19 +3,10 @@
 Aster is a student operating system for navigating college planning, test prep,
 scholarships, internships, and the next steps toward your future.
 
-## Run locally
+## Open the app
 
-```bash
-npm install
-npm run dev
-```
+Open `index.html` in a browser. The app is built with plain HTML, CSS, and
+JavaScript and does not require a build step or package installation.
 
-Open [http://localhost:3000](http://localhost:3000). The landing page includes
-an interactive demo, guided onboarding, and a sample student workspace.
-
-## Validate
-
-```bash
-npm run typecheck
-npm run build
-```
+For local development, use the VS Code Live Server extension or any static
+file server.
