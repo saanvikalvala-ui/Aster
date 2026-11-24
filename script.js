@@ -273,7 +273,8 @@ function pageContent(page) {
 
 function renderOnboarding() {
   const step = state.onboardingStep;
-  const gradeOptions = ["9th grade", "10th grade", "11th grade", "12th grade"]
+  const grades = ["9th grade", "10th grade", "11th grade", "12th grade"];
+  const gradeOptions = grades
     .map((grade) => `<option value="${grade}"${state.profile.grade === grade ? " selected" : ""}>${grade}</option>`)
     .join("");
   const locations = [
