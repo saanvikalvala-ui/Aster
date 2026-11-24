@@ -273,18 +273,44 @@ function pageContent(page) {
 
 function renderOnboarding() {
   const step = state.onboardingStep;
+  const gradeOptions = ["9th grade", "10th grade", "11th grade", "12th grade"]
+    .map((grade) => `<option value="${grade}"${state.profile.grade === grade ? " selected" : ""}>${grade}</option>`)
+    .join("");
+  const locations = [
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut", "Delaware",
+    "District of Columbia", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota",
+    "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+    "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon",
+    "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", "Tennessee", "Texas", "Utah",
+    "Vermont", "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming", "Other",
+  ];
+  const locationOptions = locations
+    .map((location) => `<option value="${escapeHTML(location)}"${state.profile.location === location ? " selected" : ""}>${escapeHTML(location)}</option>`)
+    .join("");
+  const majors = [
+    "Computer Science",
+    "Engineering",
+    "Business",
+    "Health & Medicine",
+    "Arts & Humanities",
+    "Still exploring",
+  ];
+  const majorOptions = majors
+    .map((major) => `<option value="${escapeHTML(major)}"${state.profile.major === major ? " selected" : ""}>${escapeHTML(major)}</option>`)
+    .join("");
   const steps = [
     {
       title: "First, where are you right now?",
       description: "We’ll meet you where you are. There’s no wrong place to start.",
-      fields: `<label>What grade are you in?<select name="grade"><option>9th grade</option><option>10th grade</option><option selected>11th grade</option><option>12th grade</option></select></label>
-        <div class="field-row"><label>Current GPA<input name="gpa" placeholder="e.g. 3.7" value="${escapeHTML(state.profile.gpa)}"></label><label>Your state<select name="location"><option value="">Select state</option><option>California</option><option>Oregon</option><option>Washington</option><option>Other</option></select></label></div>
+      fields: `<label>What grade are you in?<select name="grade">${gradeOptions}</select></label>
+        <div class="field-row"><label>Current GPA<input name="gpa" placeholder="e.g. 3.7" value="${escapeHTML(state.profile.gpa)}"></label><label>Your state<select name="location"><option value=""${locations.includes(state.profile.location) ? "" : " selected"}>Select state</option>${locationOptions}</select></label></div>
         <div class="field-row"><label>SAT score<input name="sat" type="number" min="400" max="1600" placeholder="Not taken yet" value="${escapeHTML(state.profile.sat)}"></label><label>ACT score<input name="act" type="number" min="1" max="36" placeholder="Not taken yet" value="${escapeHTML(state.profile.act)}"></label></div>`,
     },
     {
       title: "What are you curious about?",
       description: "Dream a little. We’ll help you find the right paths.",
-      fields: `<label>What are you interested in studying?<select name="major"><option value="">Choose an area</option><option>Computer Science</option><option>Engineering</option><option>Business</option><option>Health &amp; Medicine</option><option>Arts &amp; Humanities</option><option>Still exploring</option></select></label>
+      fields: `<label>What are you interested in studying?<select name="major"><option value=""${majors.includes(state.profile.major) ? "" : " selected"}>Choose an area</option>${majorOptions}</select></label>
         <label>What kind of future excites you?<div class="choice-chips">${["Building technology", "Helping people", "Creating things", "Leading a team", "Still exploring"].map((item) => choiceButton(item, state.profile.careers)).join("")}</div></label>
         <label>Any colleges on your mind?<input name="colleges" placeholder="Search schools or keep exploring" value="${escapeHTML(state.profile.colleges)}"></label>`,
     },
@@ -305,23 +331,21 @@ function renderOnboarding() {
   document.querySelector("#onboarding-fields").innerHTML = `<div class="field-stack">${current.fields}</div>`;
   document.querySelector("#onboarding-back").hidden = step === 1;
   document.querySelector("#onboarding-next").innerHTML = step === 3 ? "Build my Aster <span>→</span>" : "Continue <span>→</span>";
-  const locationSelect = document.querySelector('[name="location"]');
-  if (locationSelect && state.profile.location) locationSelect.value = state.profile.location;
-  const gradeSelect = document.querySelector('[name="grade"]');
-  if (gradeSelect) gradeSelect.value = state.profile.grade;
-  const majorSelect = document.querySelector('[name="major"]');
-  if (majorSelect && state.profile.major) majorSelect.value = state.profile.major;
 }
 
 function choiceButton(label, selectedItems) {
   const selected = selectedItems.includes(label);
-  return `<button type="button" class="choice-chip ${selected ? "selected" : ""}" data-choice="${escapeHTML(label)}">${escapeHTML(label)}</button>`;
+  const escapedLabel = escapeHTML(label);
+  return `<button type="button" class="choice-chip ${selected ? "selected" : ""}" data-choice="${escapedLabel}">${escapedLabel}</button>`;
 }
 
 function saveOnboardingFields() {
   const form = document.querySelector("#onboarding-form");
   const values = new FormData(form);
-  for (const [key, value] of values.entries()) state.profile[key] = String(value).trim();
+  for (const [key, value] of values.entries()) {
+    if (Array.isArray(state.profile[key])) continue;
+    state.profile[key] = String(value).trim();
+  }
   if (state.onboardingStep === 1 && !state.profile.grade) state.profile.grade = "11th grade";
 }
 
