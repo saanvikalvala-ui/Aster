@@ -70,6 +70,8 @@ type View =
   | "Internships"
   | "Opportunities"
   | "Applications"
+  | "Profile Analyzer"
+  | "Future Simulator"
   | "AI Counselor"
   | "Settings";
 
@@ -83,6 +85,8 @@ const navigation: { name: Exclude<View, "landing" | "onboarding" | "signin">; ic
   { name: "Internships", icon: Briefcase },
   { name: "Opportunities", icon: Sparkles },
   { name: "Applications", icon: FileCheck2 },
+  { name: "Profile Analyzer", icon: BarChart3 },
+  { name: "Future Simulator", icon: TrendingUp },
   { name: "AI Counselor", icon: MessageCircle },
   { name: "Settings", icon: Settings },
 ];
@@ -330,6 +334,25 @@ function ApplicationsPage() {
   return <><PageHeader eyebrow="APPLICATION TRACKER" title="You’ve got this." subtitle="One place to keep every application moving forward." action={<Button variant="primary"><Plus size={15} /> Add application</Button>} /><div className="application-stats"><div><span>IN PROGRESS</span><b>4 <small>applications</small></b></div><div><span>COMPLETED</span><b>2 <small>applications</small></b></div><div><span>NEXT DEADLINE</span><b>12 <small>days · Stanford EA</small></b></div></div><div className="panel applications-panel"><div className="panel-heading"><div><h2>Your applications</h2><p>Keep an eye on the little details.</p></div><button className="select-button">All applications <ChevronDown size={13} /></button></div><div className="application-table"><div className="table-head"><span>COLLEGE</span><span>CHECKLIST</span><span>DEADLINE</span><span>STATUS</span></div>{[{name:"Stanford University",sub:"Early Action",monogram:"S",c:"stan",done:4,total:6,due:"Oct 5, 2025",status:"In progress"},{name:"UC Berkeley",sub:"Regular Decision",monogram:"UC",c:"cal",done:2,total:5,due:"Nov 30, 2025",status:"In progress"},{name:"University of Washington",sub:"Early Action",monogram:"W",c:"wash",done:3,total:5,due:"Nov 15, 2025",status:"In progress"},{name:"University of Oregon",sub:"Early Action",monogram:"O",c:"ore",done:5,total:5,due:"Nov 1, 2025",status:"Ready to submit"}].map((app) => <div className="table-row" key={app.name}><div className="table-college"><span className={`table-monogram ${app.c}`}>{app.monogram}</span><span><b>{app.name}</b><small>{app.sub}</small></span></div><div className="checklist-progress"><div className="checklist-track"><i style={{ width: `${app.done / app.total * 100}%` }} /></div><small>{app.done}/{app.total} complete</small></div><span className="table-deadline"><CalendarDays size={13} />{app.due}</span><span className={`application-status ${app.done === app.total ? "ready" : ""}`}><i />{app.status}</span><button className="icon-button"><ChevronRight size={15} /></button></div>)}</div></div><div className="application-tip"><Lightbulb size={16} /><span><b>Quick win:</b> Ask for recommendation letters at least 4 weeks before your earliest deadline.</span><button>View checklist <ArrowRight size={13} /></button></div></>;
 }
 
+function ProfileAnalyzerPage({ setView }: { setView: (view: View) => void }) {
+  const scores = [
+    { name: "Academics", score: 84, note: "Strong GPA and a clear upward trend.", color: "profile-academics" },
+    { name: "Leadership", score: 68, note: "One more sustained role could set you apart.", color: "profile-leadership" },
+    { name: "Extracurriculars", score: 76, note: "Your interests show focus and curiosity.", color: "profile-extras" },
+    { name: "Service", score: 59, note: "A consistent volunteer commitment can help.", color: "profile-service" },
+  ];
+  return <><PageHeader eyebrow="YOUR PROFILE REPORT" title="The full picture looks good." subtitle="A thoughtful snapshot of where you shine—and where to grow next." action={<Button variant="secondary" onClick={() => setView("Future Simulator")}><TrendingUp size={14} /> Try the future simulator</Button>} /><div className="analyzer-layout"><section className="panel profile-score-panel"><div className="panel-heading"><div><h2>Overall competitiveness</h2><p>A holistic view—not just a number.</p></div><button className="icon-button" aria-label="Profile score details"><Lightbulb size={16} /></button></div><div className="score-orbit"><div className="score-orbit-inner"><span>PROFILE</span><b>78</b><small>out of 100</small></div></div><div className="score-trend"><span><ArrowUpRight size={14} /> +6 points</span> since your last check-in</div><div className="analyzer-footnote"><ShieldCheck size={14} /> Your score is a guide to your growth—not a verdict on your future.</div></section><section className="panel profile-breakdown"><div className="panel-heading"><div><h2>Your strengths, at a glance</h2><p>Every part of your story matters.</p></div></div><div className="profile-score-list">{scores.map((item) => <div className="profile-score-row" key={item.name}><div className="profile-score-heading"><span>{item.name}</span><b>{item.score}<small>/100</small></b></div><div className="profile-score-track"><i className={item.color} style={{ width: `${item.score}%` }} /></div><p>{item.note}</p></div>)}</div></section></div><section className="panel recommendations-panel"><div className="panel-heading"><div><h2>Your next best moves</h2><p>Small, practical ways to make an already strong profile even stronger.</p></div><span className="recommendation-badge"><Sparkles size={12} /> PERSONALIZED</span></div><div className="recommendation-grid"><article><span className="recommendation-number">01</span><div><b>Grow your impact in one place</b><p>Take your coding club project from idea to something your community can use.</p></div><button onClick={() => setView("Roadmap")} aria-label="View roadmap recommendation"><ArrowRight size={15} /></button></article><article><span className="recommendation-number">02</span><div><b>Build a service habit that feels like you</b><p>Try 2 hours a month teaching beginner coding at your local library.</p></div><button onClick={() => setView("Opportunities")} aria-label="Explore service opportunities"><ArrowRight size={15} /></button></article><article><span className="recommendation-number">03</span><div><b>Show your academic momentum</b><p>Your SAT practice is trending up. Keep a weekly rhythm and review missed questions.</p></div><button onClick={() => setView("SAT Prep")} aria-label="View SAT prep recommendation"><ArrowRight size={15} /></button></article></div></section></>;
+}
+
+function FutureSimulatorPage() {
+  const [sat, setSat] = useState(1250);
+  const [volunteerHours, setVolunteerHours] = useState(0);
+  const [leadership, setLeadership] = useState(false);
+  const projected = Math.min(100, 78 + Math.round((sat - 1250) / 30) + Math.round(volunteerHours / 30) + (leadership ? 6 : 0));
+  const competitiveness = Math.min(96, 68 + Math.round((sat - 1250) / 50) + Math.round(volunteerHours / 40) + (leadership ? 3 : 0));
+  return <><PageHeader eyebrow="EXPLORE THE WHAT-IFS" title="Your future, with possibilities." subtitle="Try a few what-ifs. Small steps can change how your story comes together." /><div className="simulator-layout"><section className="panel simulator-controls"><div className="panel-heading"><div><h2>Imagine your next chapter</h2><p>Adjust a few things you’re working toward.</p></div><span className="simulator-spark"><Sparkles size={15} /></span></div><label className="simulator-control"><span><b>Raise your SAT score</b><small>Current score: 1,250</small></span><strong>{sat.toLocaleString()}</strong><input type="range" min="1250" max="1550" step="10" value={sat} onChange={(event) => setSat(Number(event.target.value))} aria-label="Projected SAT score" /><span className="range-labels"><small>1,250</small><small>1,550</small></span></label><label className="simulator-control"><span><b>Complete volunteer hours</b><small>Time you’d like to give back</small></span><strong>{volunteerHours} hrs</strong><input type="range" min="0" max="200" step="10" value={volunteerHours} onChange={(event) => setVolunteerHours(Number(event.target.value))} aria-label="Projected volunteer hours" /><span className="range-labels"><small>0 hours</small><small>200 hours</small></span></label><label className="leadership-toggle"><span className="leadership-icon"><Users size={15} /></span><span><b>Step into a leadership role</b><small>For example, club president or team lead</small></span><input type="checkbox" checked={leadership} onChange={(event) => setLeadership(event.target.checked)} /><i /></label><div className="simulator-note"><Lightbulb size={14} /> These are directional estimates to help you explore—not admissions guarantees.</div></section><section className="panel projection-panel"><div className="panel-heading"><div><h2>Your projected profile</h2><p>Here’s how those goals could add up.</p></div><span className="projection-label">EXPLORING</span></div><div className="projection-score"><div><span>PROFILE STRENGTH</span><div><b>{projected}</b><small>/ 100</small></div></div><div className="projection-change"><ArrowUpRight size={15} /> +{projected - 78} pts</div></div><div className="projection-track"><i style={{ width: `${projected}%` }} /></div><div className="projection-compare"><span>Today <b>78</b></span><span>With your goals <b>{projected}</b></span></div><div className="projection-insight"><span className="insight-icon"><TrendingUp size={16} /></span><div><b>Your competitiveness could reach {competitiveness}%</b><p>Pairing academic growth with meaningful leadership and service can make a compelling story.</p></div></div><div className="projection-tags">{sat > 1250 && <span><Check size={11} /> SAT +{sat - 1250} points</span>}{volunteerHours > 0 && <span><Check size={11} /> {volunteerHours} service hours</span>}{leadership && <span><Check size={11} /> Leadership experience</span>}{sat === 1250 && volunteerHours === 0 && !leadership && <span>Choose a goal to see your projection</span>}</div><Button variant="primary" className="full-button"><Plus size={14} /> Add these goals to my roadmap</Button></section></div></>;
+}
+
 function AIPage() {
   const [messages, setMessages] = useState([{ role: "assistant", text: "Hey Jordan! I’ve been looking at your roadmap and I’m here to help you figure out whatever’s next. What’s on your mind?" }]);
   const [input, setInput] = useState("");
@@ -346,10 +369,67 @@ function SettingsPage() {
   return <><PageHeader eyebrow="YOUR ACCOUNT" title="A little about you." subtitle="Your profile helps Aster make better recommendations." action={<Button variant="primary"><Check size={15} /> Save changes</Button>} /><div className="settings-layout"><aside className="settings-menu"><button className="settings-menu-active"><Users size={15} /> Student profile</button><button><LockKeyhole size={15} /> Account & security</button><button><Sparkles size={15} /> Preferences</button></aside><section className="panel settings-panel"><div className="settings-section-head"><div className="settings-avatar">JM</div><div><b>Jordan Miller</b><span>Class of 2027 · Profile 78% complete</span></div><button className="quiet-link">Change photo</button></div><div className="settings-fields"><label>First name<input defaultValue="Jordan" /></label><label>Last name<input defaultValue="Miller" /></label><label>Email address<input defaultValue="jordan.miller@email.com" /></label><label>Grade level<select defaultValue="11th grade"><option>9th grade</option><option>10th grade</option><option>11th grade</option><option>12th grade</option></select></label><label>Intended major<input defaultValue="Computer Science" /></label><label>Location<input defaultValue="Portland, Oregon" /></label></div><div className="settings-divider" /><div className="settings-section-head compact"><div><b>Your interests</b><span>These help us find opportunities that feel right.</span></div><button className="quiet-link">Edit interests</button></div><div className="interest-chips"><span>Computer Science <X size={12} /></span><span>Entrepreneurship <X size={12} /></span><span>Community service <X size={12} /></span><button><Plus size={13} /> Add interest</button></div></section></div></>;
 }
 
-function Onboarding({ onComplete, onBack }: { onComplete: () => void; onBack: () => void }) {
+function Onboarding({ onComplete, onBack, onSignIn }: { onComplete: () => void; onBack: () => void; onSignIn: () => void }) {
   const [step, setStep] = useState(1);
   const [grade, setGrade] = useState("11th grade");
-  return <main className="onboarding-page"><header className="onboarding-nav"><button onClick={onBack} className="back-link"><ArrowLeft size={16} /> Back</button><Logo /><span>Already have an account? <button onClick={onBack}>Log in</button></span></header><div className="onboarding-wrap"><div className="onboarding-progress"><span>LET’S GET TO KNOW YOU</span><b>0{step}<small> / 03</small></b><div><i style={{ width: `${step / 3 * 100}%` }} /></div></div><AnimatePresence mode="wait"><motion.section className="onboarding-card" key={step} initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -14 }} transition={{ duration: 0.2 }}><span className="onboarding-icon">{step === 1 ? <GraduationCap size={21} /> : step === 2 ? <Compass size={21} /> : <Sparkles size={21} />}</span><h1>{step === 1 ? "First, where are you right now?" : step === 2 ? "What are you curious about?" : "What makes you, you?"}</h1><p>{step === 1 ? "We’ll meet you where you are. There’s no wrong place to start." : step === 2 ? "Dream a little. We’ll help you find the right paths." : "The best plans start with the things you already love."}</p>{step === 1 ? <div className="onboarding-fields"><label>What grade are you in?<select value={grade} onChange={(event) => setGrade(event.target.value)}><option>9th grade</option><option>10th grade</option><option>11th grade</option><option>12th grade</option></select></label><div className="onboarding-field-row"><label>Current GPA <input placeholder="e.g. 3.7" /></label><label>Your state <select defaultValue=""><option value="" disabled>Select state</option><option>California</option><option>Oregon</option><option>Washington</option><option>Other</option></select></label></div><div className="onboarding-field-row"><label>SAT score <input placeholder="Not taken yet" /></label><label>ACT score <input placeholder="Not taken yet" /></label></div></div> : step === 2 ? <div className="onboarding-fields"><label>What are you interested in studying?<select defaultValue=""><option value="" disabled>Choose an area</option><option>Computer Science</option><option>Engineering</option><option>Business</option><option>Health & Medicine</option><option>Arts & Humanities</option><option>Still exploring</option></select></label><label>What kind of future excites you?<div className="choice-chips">{["Building technology", "Helping people", "Creating things", "Leading a team", "Still exploring"].map((item) => <button type="button" className="choice-chip" key={item} onClick={(event) => event.currentTarget.classList.toggle("chosen")}>{item}</button>)}</div></label><label>Any colleges on your mind?<input placeholder="Search schools or keep exploring" /></label></div> : <div className="onboarding-fields"><label>What do you love doing outside class?<div className="choice-chips">{["Coding", "Sports", "Volunteering", "Music", "Student clubs", "Research", "Art & design", "Something else"].map((item) => <button type="button" className="choice-chip" key={item} onClick={(event) => event.currentTarget.classList.toggle("chosen")}>{item}</button>)}</div></label><label>Anything else we should know? <textarea placeholder="Leadership roles, awards, volunteer hours, or anything you’re proud of..." rows={3} /></label></div>}<div className="onboarding-actions">{step > 1 && <Button variant="secondary" onClick={() => setStep(step - 1)}>Back</Button>}<Button variant="primary" onClick={() => step === 3 ? onComplete() : setStep(step + 1)}>{step === 3 ? "Build my Aster" : "Continue"} <ArrowRight size={15} /></Button></div><div className="onboarding-assurance"><ShieldCheck size={13} /> Your information stays yours. We never sell student data.</div></motion.section></AnimatePresence></div><div className="onboarding-stars"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div></main>;
+  return (
+    <main className="onboarding-page">
+      <header className="onboarding-nav">
+        <button onClick={onBack} className="back-link"><ArrowLeft size={16} /> Back</button>
+        <Logo />
+        <span>Already have an account? <button onClick={onSignIn}>Log in</button></span>
+      </header>
+      <div className="onboarding-wrap">
+        <div className="onboarding-progress">
+          <span>LET’S GET TO KNOW YOU</span>
+          <b>0{step}<small> / 03</small></b>
+          <div><i style={{ width: `${step / 3 * 100}%` }} /></div>
+        </div>
+        <AnimatePresence mode="wait">
+          <motion.section className="onboarding-card" key={step} initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -14 }} transition={{ duration: 0.2 }}>
+            <span className="onboarding-icon">{step === 1 ? <GraduationCap size={21} /> : step === 2 ? <Compass size={21} /> : <Sparkles size={21} />}</span>
+            <h1>{step === 1 ? "First, where are you right now?" : step === 2 ? "What are you curious about?" : "What makes you, you?"}</h1>
+            <p>{step === 1 ? "We’ll meet you where you are. There’s no wrong place to start." : step === 2 ? "Dream a little. We’ll help you find the right paths." : "The best plans start with the things you already love."}</p>
+            {step === 1 ? (
+              <div className="onboarding-fields">
+                <label>What grade are you in?<select value={grade} onChange={(event) => setGrade(event.target.value)}><option>9th grade</option><option>10th grade</option><option>11th grade</option><option>12th grade</option></select></label>
+                <div className="onboarding-field-row">
+                  <label>Current GPA <input placeholder="e.g. 3.7" /></label>
+                  <label>Your state <select defaultValue=""><option value="" disabled>Select state</option><option>California</option><option>Oregon</option><option>Washington</option><option>Other</option></select></label>
+                </div>
+                <div className="onboarding-field-row">
+                  <label>SAT score <input placeholder="Not taken yet" /></label>
+                  <label>ACT score <input placeholder="Not taken yet" /></label>
+                </div>
+              </div>
+            ) : step === 2 ? (
+              <div className="onboarding-fields">
+                <label>What are you interested in studying?<select defaultValue=""><option value="" disabled>Choose an area</option><option>Computer Science</option><option>Engineering</option><option>Business</option><option>Health & Medicine</option><option>Arts & Humanities</option><option>Still exploring</option></select></label>
+                <label>What kind of future excites you?<div className="choice-chips">{["Building technology", "Helping people", "Creating things", "Leading a team", "Still exploring"].map((item) => <button type="button" className="choice-chip" key={item} onClick={(event) => event.currentTarget.classList.toggle("chosen")}>{item}</button>)}</div></label>
+                <label>Any colleges on your mind?<input placeholder="Search schools or keep exploring" /></label>
+              </div>
+            ) : (
+              <div className="onboarding-fields">
+                <label>What do you love doing outside class?<div className="choice-chips">{["Coding", "Sports", "Volunteering", "Music", "Student clubs", "Research", "Art & design", "Something else"].map((item) => <button type="button" className="choice-chip" key={item} onClick={(event) => event.currentTarget.classList.toggle("chosen")}>{item}</button>)}</div></label>
+                <div className="onboarding-field-row">
+                  <label>Volunteer hours <input type="number" min="0" placeholder="e.g. 40" /></label>
+                  <label>Leadership roles <input placeholder="Club president..." /></label>
+                </div>
+                <label>Awards or recognition <input placeholder="Competitions, honors, or awards" /></label>
+                <label>Anything else we should know? <textarea placeholder="Tell us about an activity or goal you’re proud of..." rows={3} /></label>
+              </div>
+            )}
+            <div className="onboarding-actions">
+              {step > 1 && <Button variant="secondary" onClick={() => setStep(step - 1)}>Back</Button>}
+              <Button variant="primary" onClick={() => step === 3 ? onComplete() : setStep(step + 1)}>{step === 3 ? "Build my Aster" : "Continue"} <ArrowRight size={15} /></Button>
+            </div>
+            <div className="onboarding-assurance"><ShieldCheck size={13} /> Your information stays yours. We never sell student data.</div>
+          </motion.section>
+        </AnimatePresence>
+      </div>
+      <div className="onboarding-stars"><span>✦</span><span>✧</span><span>✦</span><span>✧</span><span>✦</span></div>
+    </main>
+  );
 }
 
 function SignIn({ onBack, onCreate }: { onBack: () => void; onCreate: () => void }) {
@@ -367,6 +447,8 @@ function AppShell({ view, setView, onHome }: { view: Exclude<View, "landing" | "
     if (view === "Colleges") return <CollegesPage />;
     if (view === "Scholarships" || view === "Internships" || view === "Opportunities") return <DiscoveryPage kind={view} />;
     if (view === "Applications") return <ApplicationsPage />;
+    if (view === "Profile Analyzer") return <ProfileAnalyzerPage setView={setView} />;
+    if (view === "Future Simulator") return <FutureSimulatorPage />;
     if (view === "AI Counselor") return <AIPage />;
     return <SettingsPage />;
   };
@@ -386,9 +468,9 @@ function AppShell({ view, setView, onHome }: { view: Exclude<View, "landing" | "
 export default function AsterApp() {
   const [view, setView] = useState<View>("landing");
   const [returnView, setReturnView] = useState<View>("landing");
-  const goToSignIn = () => { setReturnView(view === "dashboard" ? "Dashboard" : "landing"); setView("signin"); };
+  const goToSignIn = () => { setReturnView(view === "Dashboard" ? "Dashboard" : "landing"); setView("signin"); };
   if (view === "landing") return <LandingPage onStart={() => setView("onboarding")} onDemo={() => setView("Dashboard")} onSignIn={goToSignIn} />;
-  if (view === "onboarding") return <Onboarding onComplete={() => setView("Dashboard")} onBack={() => setView("landing")} />;
+  if (view === "onboarding") return <Onboarding onComplete={() => setView("Dashboard")} onBack={() => setView("landing")} onSignIn={() => setView("signin")} />;
   if (view === "signin") return <SignIn onBack={() => setView(returnView)} onCreate={() => setView("onboarding")} />;
   return <AppShell view={view} setView={setView} onHome={() => setView("landing")} />;
 }
